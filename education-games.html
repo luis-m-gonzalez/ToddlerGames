@@ -1,0 +1,248 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <style>
+        html, body {
+            overflow: hidden;
+            height: 100%;
+            width: 100%;
+            margin: 0;
+        }
+
+        svg, span, div {
+            position: absolute;
+        }
+
+        span {
+            display: inline-block;
+            text-align: center;
+            padding: 5%;
+        }
+
+        .num {
+            font-family: 'Comic Sans MS';
+            font-size: 9.5vw;
+            line-height: 9.5vw;
+            width: 9.5vw;
+            height: 9.5vw;
+            font-weight: bold;
+            user-select: none;
+            z-index: 2;
+        }
+
+        #container {
+            position: relative;
+            padding-bottom: 46.25%;
+            width: 100%;
+        }
+
+        .num-hold {
+            position: absolute;
+            width: 9.5vw;
+            height: 9.8vw;
+            z-index: 1;
+            top: 98%;
+        }
+        
+        .num-hold:before {
+            content: "";
+            background: white;
+            margin: 6%;
+            width: 88%;
+            height: 88%;
+            display: block;
+        }
+
+        #play {
+            width: 15%;
+            height: 25%;
+            top: 40%;
+            left: 45%;
+        }
+
+        #rocket {
+            width: 9.5vw;
+            height: 9.5vw;
+            top: 76%;
+            left: 45%;
+        }
+
+        .hide {
+            display: none;
+        }
+    </style>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+            crossorigin="anonymous"></script>
+
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+            integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+            crossorigin="anonymous"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js" 
+            crossorigin="anonymous"></script>
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+
+       
+    <script>
+        
+
+        var colors = ["red", "blue", "green", "darkorange", "gold", "purple", "black", "brown", "gray"];
+
+        function getRandomInt(min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+        }
+
+        function shuffle(o) {
+            for (var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+            return o;
+        };
+
+        var audioI = 0;
+        var audio;
+        function testHolder(element) {
+            var number = element.text();
+            var hold = $('.hold' + number);
+            var num = $('.num' + number);
+            var holdCoord = { x: hold.offset().left, y: hold.offset().top };
+            var numCoord = { x: num.offset().left, y: num.offset().top };
+            var distance = window.innerWidth / 5;
+            if (Math.abs(holdCoord.x - numCoord.x) < distance && Math.abs(holdCoord.y - numCoord.y) < distance) {
+                if (audio) {
+                    audio.load();
+                }
+                if (audioI === 4) {
+					audioI = 1;
+				}
+				else {
+					audioI++;
+				}
+				
+				audio = document.getElementById("so" + audioI);
+                audio.play();
+                num.animate({
+                    top: hold.css('top'),
+                    left: hold.css('left'),
+                    padding: 0
+                }, 300, function () {
+                    $(this).addClass('flip');
+                    testRocket();
+                });
+                num.draggable("destroy");
+            }
+        }
+
+        function testRocket() {
+            if (!($('.num').not('.flip')).length) {
+                audio.load();
+                audio = document.getElementById("so5");
+                audio.play();
+                $('#rocket').animate({
+                    top: '-=300%',
+                }, 7000, 'easeInCubic', function () {
+                    setTimeout(function () {
+                        restart();
+                    }, 7000);
+                });
+            }
+        }
+
+        function restart() {
+            audioI = 0;
+            $('.num').remove();
+            $('#rocket').removeAttr('style');
+            initialize();
+        }
+
+        function initialize() {
+
+            var container = $("#container");
+            var shuffledColors = shuffle(colors);
+            var coords = new Array(11);
+            coords[0] = { x: 45, y: 55 };
+            for (var i = 1; i < 10; i++) {
+                var colorNum = getRandomInt(0, 9);
+                var left = getRandomInt(0, 85);
+                var top = getRandomInt(0, 55);
+                while (coords.some(function (coord) {
+                    return Math.abs(coord.x - left) < 15 && Math.abs(coord.y - top) < 15;
+                })) {
+                    left = getRandomInt(0, 85);
+                    top = getRandomInt(0, 55);
+                }
+
+                coords[i] = { x: left, y: top };
+
+                container.append("<span class='num animated zoomIn num" + i + "' style='color:" + shuffledColors[i - 1] + ";top:" + top + "%;left:" + left + "%'>" + i + "</span>");
+
+                container.append("<div class='num-hold hold" + i + "' style='background-color:" + shuffledColors[i - 1] + ";left:" + (85 - (10 * (i - 1))) + "%'></div>");
+            };
+            $(".num").draggable({ cursor: "move", stop: function (event, ui) { testHolder($(this)); } });
+
+        }
+
+        $(document).ready(function () {
+
+            $("#play").on('click', function () { 
+                var html = $("html")[0];
+                if (html.requestFullscreen) {
+                    html.requestFullscreen();
+                }
+
+                if (html.webkitRequestFullscreen) {
+                    html.webkitRequestFullscreen();
+                }
+
+                if (html.mozRequestFullscreen) {
+                    html.mozRequestFullscreen();
+                }
+
+                if (html.msRequestFullscreen) {
+                    html.msRequestFullscreen();
+                }
+
+                if (window.innerHeight > window.innerWidth) {
+                    alert("Please set Landscape orientation on your device before continuing.");
+                }
+
+                $(this).hide();
+                $("#rocket").removeClass("hide");
+                initialize();
+
+            });
+        });
+    </script>
+</head>
+<body>
+    <div id="container">
+		<audio id="so1">
+		  <source src="./mp3/so1.mp3" type="audio/mp3">
+		</audio>
+		<audio id="so2">
+		  <source src="./mp3/so2.mp3" type="audio/mp3">
+		</audio>
+		<audio id="so3">
+		  <source src="./mp3/so3.mp3" type="audio/mp3">
+		</audio>
+		<audio id="so4">
+		  <source src="./mp3/so4.mp3" type="audio/mp3">
+		</audio>
+		<audio id="so5">
+		  <source src="./mp3/so5.mp3" type="audio/mp3">
+		</audio>
+        <svg id="play" xmlns="http://www.w3.org/2000/svg" fill="green" viewBox=" 0 0 100 100">
+            <polygon points="0,0 100,50 0,100" />
+        </svg>
+
+        <svg id="rocket" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="hide"><path d="M7.411 21.39l-4.054 2.61-.266-1.053c-.187-.744-.086-1.534.282-2.199l2.617-4.729c.387 1.6.848 3.272 1.421 5.371zm13.215-.642l-2.646-4.784c-.391 1.656-.803 3.22-1.369 5.441l4.032 2.595.266-1.053c.186-.743.085-1.533-.283-2.199zm-10.073 3.252h2.895l.552-2h-4l.553 2zm1.447-24c-3.489 2.503-5 5.488-5 9.191 0 3.34 1.146 7.275 2.38 11.809h5.273c1.181-4.668 2.312-8.577 2.347-11.844.04-3.731-1.441-6.639-5-9.156zm.012 2.543c1.379 1.201 2.236 2.491 2.662 3.996-.558.304-1.607.461-2.674.461-1.039 0-2.072-.145-2.641-.433.442-1.512 1.304-2.824 2.653-4.024z" /></svg>
+    </div>
+    
+</body>
+</html>
