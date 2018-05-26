@@ -83,6 +83,12 @@
             left: 15%;
             top: -70%;
         }
+
+        .transit {
+            -webkit-transform: translateY(400%);
+            transform: translateY(400%);
+            transition: transform 18s linear;
+        }
     </style>
 
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"
@@ -202,7 +208,8 @@
         }
 
         function showMoon() {
-            $("#moon").animate({ top: "+=250%"}, 18000, restart);
+            //$("#moon").animate({ top: "+=250%"}, 18000, restart);
+            $("#moon").addClass("transit");
         }
 
         function restart() {
