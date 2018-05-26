@@ -191,31 +191,35 @@
                 audio = document.getElementById("so5");
                 audio.play();
                 setTimeout(showMoon, 12500);
+                setTimeout(hideNumbers, 7500);
                 $('#rocket').animate({
                     top: '-=50%',
-                }, 8000, 'easeInCubic', function () {
-                    $('.num, .num-hold').animate({
-                        top: '+=150%',
-                    },
-                    {
-                        duration: 4000,
-                        queue: false,
-                        complete: function () { $(this).remove(); }
-                    });
-                   
-                });
+                }, 8000, 'easeInCubic');
             }
+        }
+
+        function hideNumbers() {
+            $('.num, .num-hold').animate({
+                top: '+=150%',
+            },
+            {
+                duration: 6000,
+                queue: false,
+                complete: function () { $(this).remove(); }
+            });
+
         }
 
         function showMoon() {
             //$("#moon").animate({ top: "+=250%"}, 18000, restart);
             $("#moon").addClass("transit");
+            setTimeout(restart, 20000);
         }
 
         function restart() {
             audioI = 0;
             $('.num').remove();
-            $('#rocket, #moon').removeAttr('style');
+            $('#rocket, #moon').removeAttr('style').removeClass("transit");
             initialize();
         }
 
