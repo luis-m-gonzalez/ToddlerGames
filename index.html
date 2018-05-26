@@ -74,6 +74,15 @@
         .hide {
             display: none;
         }
+
+        #moon {
+            width: 30vw;
+            height: 30vw;
+            background: url(./svg/moon.svg) no-repeat;
+            background-size: contain;
+            left: 15%;
+            top: -70%;
+        }
     </style>
 
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"
@@ -109,6 +118,7 @@
 
         var audioI = 0;
         var audio;
+
         function testHolder(element) {
             var number = element.text();
             var hold = $('.hold' + number);
@@ -116,7 +126,8 @@
             var holdCoord = { x: hold.offset().left, y: hold.offset().top };
             var numCoord = { x: num.offset().left, y: num.offset().top };
             var distance = window.innerWidth / 5;
-            if (Math.abs(holdCoord.x - numCoord.x) < distance && Math.abs(holdCoord.y - numCoord.y) < distance) {
+            var success = Math.abs(holdCoord.x - numCoord.x) < distance && Math.abs(holdCoord.y - numCoord.y) < distance;
+            if (success) {
                 if (audio) {
                     audio.load();
                 }
@@ -138,6 +149,33 @@
                     testRocket();
                 });
                 num.draggable("destroy");
+                return;
+            }
+
+            if (numCoord.y < 0) {
+                num.animate({
+                    top: window.innerHeight / 3
+                }, { queue: false, duration: 2000 });
+            }
+
+            if (numCoord.x < 0) {
+                num.animate({
+                    left: window.innerWidth / 3
+                }, { queue: false, duration: 2000 });
+            }
+
+            var minBottom = window.innerHeight * 0.60;
+            if (numCoord.y > minBottom) {
+                num.animate({
+                    top: "-=50%"
+                }, { queue: false, duration: 2000 });
+            }
+
+            var minRight = window.innerWidth * 0.80;
+            if (numCoord.x > minRight) {
+                num.animate({
+                    left: "-=50%"
+                }, { queue: false, duration: 2000 });
             }
         }
 
@@ -146,20 +184,31 @@
                 audio.load();
                 audio = document.getElementById("so5");
                 audio.play();
+                setTimeout(showMoon, 12500);
                 $('#rocket').animate({
-                    top: '-=300%',
-                }, 7000, 'easeInCubic', function () {
-                    setTimeout(function () {
-                        restart();
-                    }, 7000);
+                    top: '-=50%',
+                }, 8000, 'easeInCubic', function () {
+                    $('.num, .num-hold').animate({
+                        top: '+=150%',
+                    },
+                    {
+                        duration: 4000,
+                        queue: false,
+                        complete: function () { $(this).remove(); }
+                    });
+                   
                 });
             }
+        }
+
+        function showMoon() {
+            $("#moon").animate({ top: "+=250%"}, 18000, restart);
         }
 
         function restart() {
             audioI = 0;
             $('.num').remove();
-            $('#rocket').removeAttr('style');
+            $('#rocket, #moon').removeAttr('style');
             initialize();
         }
 
@@ -244,6 +293,8 @@
         </svg>
 
         <svg id="rocket" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="hide"><path d="M7.411 21.39l-4.054 2.61-.266-1.053c-.187-.744-.086-1.534.282-2.199l2.617-4.729c.387 1.6.848 3.272 1.421 5.371zm13.215-.642l-2.646-4.784c-.391 1.656-.803 3.22-1.369 5.441l4.032 2.595.266-1.053c.186-.743.085-1.533-.283-2.199zm-10.073 3.252h2.895l.552-2h-4l.553 2zm1.447-24c-3.489 2.503-5 5.488-5 9.191 0 3.34 1.146 7.275 2.38 11.809h5.273c1.181-4.668 2.312-8.577 2.347-11.844.04-3.731-1.441-6.639-5-9.156zm.012 2.543c1.379 1.201 2.236 2.491 2.662 3.996-.558.304-1.607.461-2.674.461-1.039 0-2.072-.145-2.641-.433.442-1.512 1.304-2.824 2.653-4.024z" /></svg>
+
+        <div id="moon"></div>
     </div>
     
 </body>
