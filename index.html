@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title></title>
+    <title>A responsive educational game to help toddlers learn their numbers. Designed to work on any device, on fullscreen mode. A touch screen is recommended but not required.</title>
     <style>
         html, body {
             overflow: hidden;
@@ -11,14 +11,36 @@
             margin: 0;
         }
 
-        svg, span, div {
+        body.sky {
+            color: #fff;
+            background: linear-gradient(180deg, MidnightBlue 0%, MidnightBlue 25%, DeepSkyBlue 88%, DeepSkyBlue 91%,LimeGreen 91%,LimeGreen 100%);
+            background-size: 400% 400%;
+            background-position: 50% 100%
+        }
+
+        body.lift-off {
+            animation: Gradient 10s 1;
+            animation-fill-mode: forwards;
+        }
+
+
+            @keyframes Gradient {
+                0% {
+                    background-position: 50% 100%
+                }
+
+                100% {
+                    background-position: 50% 0%
+                }
+            }
+
+            svg, span, div {
             position: absolute;
         }
 
         span {
             display: inline-block;
             text-align: center;
-            padding: 5%;
         }
 
         .num {
@@ -31,11 +53,16 @@
             user-select: none;
             z-index: 2;
             cursor: pointer;
+            padding: 5%;
+        }
+
+        .num.num-locked {
+            padding: 0;
         }
 
         #container {
             position: relative;
-            padding-bottom: 46.25%;
+            padding-bottom: 56.25%;
             width: 100%;
         }
 
@@ -44,7 +71,7 @@
             width: 9.5vw;
             height: 9.8vw;
             z-index: 1;
-            top: 98%;
+            top: 72%;
         }
         
         .num-hold:before {
@@ -67,7 +94,7 @@
         #rocket {
             width: 9.5vw;
             height: 9.5vw;
-            top: 76%;
+            top: 50%;
             left: 45%;
         }
 
@@ -107,9 +134,11 @@
 
        
     <script>
-        
-
+        var dev = 0;
         var colors = ["red", "blue", "green", "darkorange", "gold", "purple", "black", "brown", "gray"];
+        var audioI = 0;
+        var audio;
+        var iteration = 0;
 
         function getRandomInt(min, max) {
             min = Math.ceil(min);
@@ -121,9 +150,6 @@
             for (var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
             return o;
         };
-
-        var audioI = 0;
-        var audio;
 
         function testHolder(element) {
             var number = element.text();
@@ -151,7 +177,7 @@
                     left: hold.css('left'),
                     padding: 0
                 }, 300, function () {
-                    $(this).addClass('flip');
+                    $(this).addClass('flip').removeClass('num-unlocked');
                     testRocket();
                 });
                 num.draggable("destroy");
@@ -161,152 +187,189 @@
             if (numCoord.y < 0) {
                 num.animate({
                     top: window.innerHeight / 3
-                }, { queue: false, duration: 2000 });
+                }, { queue: false, duration: 1000 });
             }
 
             if (numCoord.x < 0) {
                 num.animate({
                     left: window.innerWidth / 3
-                }, { queue: false, duration: 2000 });
+                }, { queue: false, duration: 1000 });
             }
 
             var minBottom = window.innerHeight * 0.60;
             if (numCoord.y > minBottom) {
                 num.animate({
                     top: "-=50%"
-                }, { queue: false, duration: 2000 });
+                }, { queue: false, duration: 1000 });
             }
 
             var minRight = window.innerWidth * 0.80;
             if (numCoord.x > minRight) {
                 num.animate({
                     left: "-=50%"
-                }, { queue: false, duration: 2000 });
+                }, { queue: false, duration: 1000 });
             }
         }
 
         function testRocket() {
-            if (!($('.num').not('.flip')).length) {
+            if (dev | !$('.num-unlocked').length) {
                 audio.load();
                 audio = document.getElementById("so5");
                 audio.play();
-                setTimeout(showMoon, 12500);
-                setTimeout(hideNumbers, 7500);
+                setTimeout(showMoon, 13500);
+                setTimeout(liftOff, 7500);
                 $('#rocket').animate({
-                    top: '-=50%',
+                    top: '-=40%',
                 }, 8000, 'easeInCubic');
             }
         }
 
-        function hideNumbers() {
+        function liftOff() {
             $('.num, .num-hold').animate({
-                top: '+=150%',
+                top: '+=500%',
             },
             {
-                duration: 6000,
+                duration: 7000,
                 queue: false,
                 complete: function () { $(this).remove(); }
             });
-
+            $("body").addClass("lift-off");
         }
 
         function showMoon() {
-            //$("#moon").animate({ top: "+=250%"}, 18000, restart);
             $("#moon").addClass("transit");
             setTimeout(restart, 20000);
         }
 
         function restart() {
             audioI = 0;
+            iteration++;
             $('.num').remove();
             $('#rocket, #moon').removeAttr('style').removeClass("transit");
-            initialize();
+            $('body').removeClass('lift-off');
+            createNumbers();
         }
 
-        function initialize() {
+        function createNumber(shuffledColors, container, coords, i, forwards) {
+            var colorNum = getRandomInt(0, 9);
+            var left;
+            var top;
+            var numberLocked = i > iteration;
+            var cssClass;
 
-            var container = $("#container");
-            var shuffledColors = shuffle(colors);
-            var coords = new Array(11);
-            coords[0] = { x: 45, y: 55 };
-            for (var i = 1; i < 10; i++) {
-                var colorNum = getRandomInt(0, 9);
-                var left = getRandomInt(0, 85);
-                var top = getRandomInt(0, 55);
+            let holdLeft = forwards ? (5 + (10 * (i - 1))) : (85 - (10 * (i - 1)));
+            container.append("<div class='num-hold hold" + i + "' style='background-color:" + shuffledColors[i - 1] + ";left:" + holdLeft + "%' ></div>");
+
+            if (numberLocked) {
+                top = '72';
+                left = holdLeft;
+                cssClass = 'num-locked';
+            }
+            else {
+                left = getRandomInt(0, 85);
+                top = getRandomInt(0, 45);
+                cssClass = 'num-unlocked';
+
                 while (coords.some(function (coord) {
                     return Math.abs(coord.x - left) < 15 && Math.abs(coord.y - top) < 15;
                 })) {
                     left = getRandomInt(0, 85);
-                    top = getRandomInt(0, 55);
+                    top = getRandomInt(0, 45);
                 }
+            }
 
-                coords[i] = { x: left, y: top };
+            coords[i] = { x: left, y: top };
 
-                container.append("<span class='num animated zoomIn num" + i + "' style='color:" + shuffledColors[i - 1] + ";top:" + top + "%;left:" + left + "%'>" + i + "</span>");
-
-                container.append("<div class='num-hold hold" + i + "' style='background-color:" + shuffledColors[i - 1] + ";left:" + (85 - (10 * (i - 1))) + "%'></div>");
-            };
-            $(".num").draggable({ cursor: "move", stop: function (event, ui) { testHolder($(this)); } });
+            container.append("<span class='" + cssClass +" num animated zoomIn num" + i + "' style='color:" + shuffledColors[i - 1] + ";top:" + top + "%;left:" + left + "%; z-index:" + (100 - holdLeft) + "' >" + i + "</span>");
 
         }
 
+        function createNumbers() {
+            var container = $("#container");
+            var shuffledColors = shuffle(colors);
+            var coords = new Array(11);
+            coords[0] = { x: 45, y: 40 };
+
+            for (var i = 1; i < 10; i++) {
+                createNumber(shuffledColors, container, coords, i, true);
+            };
+
+            $(".num-unlocked").draggable({ cursor: "move", stop: function (event, ui) { testHolder($(this)); } });
+        }
+
+        function setFullScreen() {
+            if (dev) {
+                return;
+            }
+
+            let html = $("html")[0];
+
+            if (html.requestFullscreen) {
+                html.requestFullscreen();
+            }
+
+            if (html.webkitRequestFullscreen) {
+                html.webkitRequestFullscreen();
+            }
+
+            if (html.mozRequestFullScreen) {
+                html.mozRequestFullScreen();
+            }
+
+            if (html.msRequestFullscreen) {
+                html.msRequestFullscreen();
+            }
+        }
+
+        function startGame(startButton) {
+            iteration = 1;
+            setFullScreen();
+
+            if ((window.innerHeight > window.innerWidth) && !dev) {
+                alert("Please set Landscape orientation on your device before continuing.");
+            }
+
+            startButton.hide();
+            $("#rocket").removeClass("hide");
+            $("body").addClass("sky");
+            createNumbers();
+        }
+
         $(document).ready(function () {
-
-            $("#play").on('click', function () { 
-                var html = $("html")[0];
-                if (html.requestFullscreen) {
-                    html.requestFullscreen();
-                }
-
-                if (html.webkitRequestFullscreen) {
-                    html.webkitRequestFullscreen();
-                }
-
-                if (html.mozRequestFullScreen) {
-                    html.mozRequestFullScreen();
-                }
-
-                if (html.msRequestFullscreen) {
-                    html.msRequestFullscreen();
-                }
-
-                if (window.innerHeight > window.innerWidth) {
-                    alert("Please set Landscape orientation on your device before continuing.");
-                }
-
-                $(this).hide();
-                $("#rocket").removeClass("hide");
-                initialize();
-
+            if (dev) {
+                startGame($("#play"));
+            }
+            $("#play").on('click', function () {
+                startGame($(this));
             });
         });
     </script>
 </head>
 <body>
     <div id="container">
-		<audio id="so1">
-		  <source src="./mp3/so1.mp3" type="audio/mp3">
-		</audio>
-		<audio id="so2">
-		  <source src="./mp3/so2.mp3" type="audio/mp3">
-		</audio>
-		<audio id="so3">
-		  <source src="./mp3/so3.mp3" type="audio/mp3">
-		</audio>
-		<audio id="so4">
-		  <source src="./mp3/so4.mp3" type="audio/mp3">
-		</audio>
-		<audio id="so5">
-		  <source src="./mp3/so5.mp3" type="audio/mp3">
-		</audio>
+        <audio id="so1">
+            <source src="./mp3/so1.mp3" type="audio/mp3">
+        </audio>
+        <audio id="so2">
+            <source src="./mp3/so2.mp3" type="audio/mp3">
+        </audio>
+        <audio id="so3">
+            <source src="./mp3/so3.mp3" type="audio/mp3">
+        </audio>
+        <audio id="so4">
+            <source src="./mp3/so4.mp3" type="audio/mp3">
+        </audio>
+        <audio id="so5">
+            <source src="./mp3/so5.mp3" type="audio/mp3">
+        </audio>
         <svg id="play" xmlns="http://www.w3.org/2000/svg" fill="green" viewBox=" 0 0 100 100">
             <polygon points="0,0 100,50 0,100" />
         </svg>
 
-        <svg id="rocket" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="hide"><path d="M7.411 21.39l-4.054 2.61-.266-1.053c-.187-.744-.086-1.534.282-2.199l2.617-4.729c.387 1.6.848 3.272 1.421 5.371zm13.215-.642l-2.646-4.784c-.391 1.656-.803 3.22-1.369 5.441l4.032 2.595.266-1.053c.186-.743.085-1.533-.283-2.199zm-10.073 3.252h2.895l.552-2h-4l.553 2zm1.447-24c-3.489 2.503-5 5.488-5 9.191 0 3.34 1.146 7.275 2.38 11.809h5.273c1.181-4.668 2.312-8.577 2.347-11.844.04-3.731-1.441-6.639-5-9.156zm.012 2.543c1.379 1.201 2.236 2.491 2.662 3.996-.558.304-1.607.461-2.674.461-1.039 0-2.072-.145-2.641-.433.442-1.512 1.304-2.824 2.653-4.024z" /></svg>
+        <svg id="rocket" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="DarkSlateGray" class="hide"><path d="M7.411 21.39l-4.054 2.61-.266-1.053c-.187-.744-.086-1.534.282-2.199l2.617-4.729c.387 1.6.848 3.272 1.421 5.371zm13.215-.642l-2.646-4.784c-.391 1.656-.803 3.22-1.369 5.441l4.032 2.595.266-1.053c.186-.743.085-1.533-.283-2.199zm-10.073 3.252h2.895l.552-2h-4l.553 2zm1.447-24c-3.489 2.503-5 5.488-5 9.191 0 3.34 1.146 7.275 2.38 11.809h5.273c1.181-4.668 2.312-8.577 2.347-11.844.04-3.731-1.441-6.639-5-9.156zm.012 2.543c1.379 1.201 2.236 2.491 2.662 3.996-.558.304-1.607.461-2.674.461-1.039 0-2.072-.145-2.641-.433.442-1.512 1.304-2.824 2.653-4.024z" /></svg>
 
         <div id="moon"></div>
     </div>
-    
+
 </body>
 </html>
