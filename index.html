@@ -2,6 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
     <title>A responsive educational game to help toddlers learn their numbers. Designed to work on any device, on fullscreen mode. A touch screen is recommended but not required.</title>
     <style>
         html, body {
@@ -11,30 +12,30 @@
             margin: 0;
         }
 
-        body.sky {
-            color: #fff;
-            background: linear-gradient(180deg, MidnightBlue 0%, MidnightBlue 25%, DeepSkyBlue 88%, DeepSkyBlue 91%,LimeGreen 91%,LimeGreen 100%);
-            background-size: 400% 400%;
-            background-position: 50% 100%
-        }
-
-        body.lift-off {
-            animation: Gradient 10s 1;
-            animation-fill-mode: forwards;
-        }
-
-
-            @keyframes Gradient {
-                0% {
-                    background-position: 50% 100%
-                }
-
-                100% {
-                    background-position: 50% 0%
-                }
+            body.sky {
+                color: #fff;
+                background: linear-gradient(180deg, MidnightBlue 0%, MidnightBlue 25%, DeepSkyBlue 88%, DeepSkyBlue 91%,LimeGreen 91%,LimeGreen 100%);
+                background-size: 400% 400%;
+                background-position: 50% 100%
             }
 
-            svg, span, div {
+            body.lift-off {
+                animation: Gradient 10s 1;
+                animation-fill-mode: forwards;
+            }
+
+
+        @keyframes Gradient {
+            0% {
+                background-position: 50% 100%
+            }
+
+            100% {
+                background-position: 50% 0%
+            }
+        }
+
+        svg, span, div {
             position: absolute;
         }
 
@@ -56,9 +57,9 @@
             padding: 5%;
         }
 
-        .num.num-locked {
-            padding: 0;
-        }
+            .num.num-locked {
+                padding: 0;
+            }
 
         #container {
             position: relative;
@@ -73,15 +74,15 @@
             z-index: 1;
             top: 72%;
         }
-        
-        .num-hold:before {
-            content: "";
-            background: white;
-            margin: 6%;
-            width: 88%;
-            height: 88%;
-            display: block;
-        }
+
+            .num-hold:before {
+                content: "";
+                background: white;
+                margin: 6%;
+                width: 88%;
+                height: 88%;
+                display: block;
+            }
 
         #play {
             width: 15%;
@@ -94,7 +95,7 @@
         #rocket {
             width: 9.5vw;
             height: 9.5vw;
-            top: 50%;
+            top: 53%;
             left: 45%;
         }
 
@@ -126,13 +127,13 @@
             integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
             crossorigin="anonymous"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js" 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"
             crossorigin="anonymous"></script>
 
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
 
-       
+
     <script>
         var dev = 0;
         var colors = ["red", "blue", "green", "darkorange", "gold", "purple", "black", "brown", "gray"];
@@ -164,13 +165,13 @@
                     audio.load();
                 }
                 if (audioI === 4) {
-					audioI = 1;
-				}
-				else {
-					audioI++;
-				}
-				
-				audio = document.getElementById("so" + audioI);
+                    audioI = 1;
+                }
+                else {
+                    audioI++;
+                }
+
+                audio = document.getElementById("so" + audioI);
                 audio.play();
                 num.animate({
                     top: hold.css('top'),
@@ -216,6 +217,7 @@
                 audio.load();
                 audio = document.getElementById("so5");
                 audio.play();
+                $("#fire-red, #fire-yellow").css("display", "block");
                 setTimeout(showMoon, 13500);
                 setTimeout(liftOff, 7500);
                 $('#rocket').animate({
@@ -228,11 +230,11 @@
             $('.num, .num-hold').animate({
                 top: '+=500%',
             },
-            {
-                duration: 7000,
-                queue: false,
-                complete: function () { $(this).remove(); }
-            });
+                {
+                    duration: 7000,
+                    queue: false,
+                    complete: function () { $(this).remove(); }
+                });
             $("body").addClass("lift-off");
         }
 
@@ -242,6 +244,7 @@
         }
 
         function restart() {
+            $("#fire-red, #fire-yellow").css("display", "none");
             audioI = 0;
             iteration++;
             $('.num').remove();
@@ -280,7 +283,7 @@
 
             coords[i] = { x: left, y: top };
 
-            container.append("<span class='" + cssClass +" num animated zoomIn num" + i + "' style='color:" + shuffledColors[i - 1] + ";top:" + top + "%;left:" + left + "%; z-index:" + (100 - holdLeft) + "' >" + i + "</span>");
+            container.append("<span class='" + cssClass + " num animated zoomIn num" + i + "' style='color:" + shuffledColors[i - 1] + ";top:" + top + "%;left:" + left + "%; z-index:" + (100 - holdLeft) + "' >" + i + "</span>");
 
         }
 
@@ -366,7 +369,67 @@
             <polygon points="0,0 100,50 0,100" />
         </svg>
 
-        <svg id="rocket" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="DarkSlateGray" class="hide"><path d="M7.411 21.39l-4.054 2.61-.266-1.053c-.187-.744-.086-1.534.282-2.199l2.617-4.729c.387 1.6.848 3.272 1.421 5.371zm13.215-.642l-2.646-4.784c-.391 1.656-.803 3.22-1.369 5.441l4.032 2.595.266-1.053c.186-.743.085-1.533-.283-2.199zm-10.073 3.252h2.895l.552-2h-4l.553 2zm1.447-24c-3.489 2.503-5 5.488-5 9.191 0 3.34 1.146 7.275 2.38 11.809h5.273c1.181-4.668 2.312-8.577 2.347-11.844.04-3.731-1.441-6.639-5-9.156zm.012 2.543c1.379 1.201 2.236 2.491 2.662 3.996-.558.304-1.607.461-2.674.461-1.039 0-2.072-.145-2.641-.433.442-1.512 1.304-2.824 2.653-4.024z" /></svg>
+        <svg xmlns:dc="http://purl.org/dc/elements/1.1/"
+             xmlns:cc="http://creativecommons.org/ns#"
+             xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+             xmlns:svg="http://www.w3.org/2000/svg"
+             xmlns="http://www.w3.org/2000/svg"
+             xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+             xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+             id="rocket"
+             viewBox="0 0 24 32"
+             class="hide"
+             version="1.1"
+             sodipodi:docname="rocket2.svg"
+             width="24"
+             height="32"
+             style="fill:#2f4f4f"
+             inkscape:version="0.92.3 (2405546, 2018-03-11)">
+            <metadata id="metadata3729">
+                <rdf:RDF>
+                    <cc:Work rdf:about="">
+                        <dc:format>image/svg+xml</dc:format>
+                        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+                        <dc:title />
+                    </cc:Work>
+                </rdf:RDF>
+            </metadata>
+            <defs id="defs3727" />
+            <sodipodi:namedview pagecolor="#ffffff"
+                                bordercolor="#666666"
+                                borderopacity="1"
+                                objecttolerance="10"
+                                gridtolerance="10"
+                                guidetolerance="10"
+                                inkscape:pageopacity="0"
+                                inkscape:pageshadow="2"
+                                inkscape:window-width="768"
+                                inkscape:window-height="711"
+                                id="namedview3725"
+                                showgrid="false"
+                                fit-margin-top="-2.7755576e-017"
+                                inkscape:zoom="6.0398704"
+                                inkscape:cx="14.15038"
+                                inkscape:cy="0.93147574"
+                                inkscape:window-x="441"
+                                inkscape:window-y="31"
+                                inkscape:window-maximized="0"
+                                inkscape:current-layer="rocket" />
+            <path d="M 7.411577,21.39 3.357779,24 3.0917922,22.947 c -0.1869907,-0.744 -0.085996,-1.534 0.281986,-2.199 l 2.6168696,-4.729 c 0.3869807,1.6 0.8479577,3.272 1.4209292,5.371 z m 13.214342,-0.642 -2.645868,-4.784 c -0.390981,1.656 -0.80296,3.22 -1.368932,5.441 L 20.642918,24 20.908905,22.947 c 0.18599,-0.743 0.08499,-1.533 -0.282986,-2.199 z M 10.553421,24 h 2.894855 l 0.551973,-2 H 10.000448 Z M 12.000349,-1e-6 c -3.4888268,2.503 -4.9997515,5.488 -4.9997515,9.191 C 7.0005975,12.531 8.1465404,16.466 9.3804789,21 h 5.2727371 c 1.180941,-4.668 2.311885,-8.577 2.346883,-11.844001 0.04,-3.731 -1.440928,-6.639 -4.99975,-9.156 z m 0.012,2.543 c 1.378931,1.201 2.235889,2.491 2.661867,3.996 -0.557972,0.304 -1.60692,0.461 -2.673866,0.461 -1.038949,0 -2.0718974,-0.145 -2.6408691,-0.433 0.441978,-1.512 1.3039351,-2.824 2.6528681,-4.024 z"
+                  id="path3722"/>
+            <ellipse style="fill:#ff0000; display:none"
+                     id="fire-red"
+                     cx="11.970732"
+                     cy="26.84878"
+                     rx="1.0243902"
+                     ry="2.692683" />
+            <ellipse style="fill:#ffcc00; display:none"
+                     id="fire-yellow"
+                     cx="11.968239"
+                     cy="26.326839"
+                     rx="0.62464041"
+                     ry="1.6167839" />
+        </svg>
 
         <div id="moon"></div>
     </div>
