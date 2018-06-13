@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-    <title>A responsive educational game to help toddlers learn their numbers. Designed to work on any device, on fullscreen mode. A touch screen is recommended but not required.</title>
+    <title>A responsive educational game to help toddlers learn numbers and astronomy. Designed to work on any device, on fullscreen mode. A touch screen is recommended but not required.</title>
     <style>
         html, body {
             overflow: hidden;
@@ -12,17 +12,17 @@
             margin: 0;
         }
 
-            body.sky {
-                color: #fff;
-                background: linear-gradient(180deg, MidnightBlue 0%, MidnightBlue 25%, DeepSkyBlue 88%, DeepSkyBlue 91%,LimeGreen 91%,LimeGreen 100%);
-                background-size: 400% 400%;
-                background-position: 50% 100%
-            }
+        body.sky {
+            color: #fff;
+            background: linear-gradient(180deg, MidnightBlue 0%, MidnightBlue 25%, DeepSkyBlue 88%, DeepSkyBlue 91%,LimeGreen 91%,LimeGreen 100%);
+            background-size: 400% 400%;
+            background-position: 50% 100%
+        }
 
-            body.lift-off {
-                animation: Gradient 10s 1;
-                animation-fill-mode: forwards;
-            }
+        body.lift-off {
+            animation: Gradient 10s 1;
+            animation-fill-mode: forwards;
+        }
 
 
         @keyframes Gradient {
@@ -103,11 +103,12 @@
             display: none;
         }
 
-        #moon {
+        #planet {
             width: 30vw;
             height: 30vw;
-            background: url(./svg/moon.svg) no-repeat;
+            background-repeat: no-repeat;
             background-size: contain;
+            background-image: url(./svg/planet1.svg);
             left: 15%;
             top: -70%;
         }
@@ -140,6 +141,7 @@
         var audioI = 0;
         var audio;
         var iteration = 0;
+        var speed = 1;
 
         function getRandomInt(min, max) {
             min = Math.ceil(min);
@@ -152,15 +154,20 @@
             return o;
         };
 
-        function testHolder(element) {
+        function testHolder(element, goForwards) {
             var number = element.text();
             var hold = $('.hold' + number);
             var num = $('.num' + number);
             var holdCoord = { x: hold.offset().left, y: hold.offset().top };
             var numCoord = { x: num.offset().left, y: num.offset().top };
+            var parsedNumber = parseInt(number, 10);
+            var firstNumber = goForwards ? 1 : 9;
+            var previousNumber = goForwards ? parsedNumber - 1 : parsedNumber + 1;
+            var isValid = (parsedNumber === firstNumber) || !$('.num' + previousNumber).hasClass('num-unlocked');
             var distance = window.innerWidth / 5;
+
             var success = Math.abs(holdCoord.x - numCoord.x) < distance && Math.abs(holdCoord.y - numCoord.y) < distance;
-            if (success) {
+            if (isValid && success) {
                 if (audio) {
                     audio.load();
                 }
@@ -197,7 +204,7 @@
                 }, { queue: false, duration: 1000 });
             }
 
-            var minBottom = window.innerHeight * 0.60;
+            var minBottom = window.innerHeight * 0.55;
             if (numCoord.y > minBottom) {
                 num.animate({
                     top: "-=50%"
@@ -213,16 +220,16 @@
         }
 
         function testRocket() {
-            if (dev | !$('.num-unlocked').length) {
+            if (!$('.num-unlocked').length) {
                 audio.load();
                 audio = document.getElementById("so5");
                 audio.play();
                 $("#fire-red, #fire-yellow").css("display", "block");
-                setTimeout(showMoon, 13500);
-                setTimeout(liftOff, 7500);
+                setTimeout(showPlanet, 13500 * speed);
+                setTimeout(liftOff, 7500 * speed);
                 $('#rocket').animate({
                     top: '-=40%',
-                }, 8000, 'easeInCubic');
+                }, 8000 * speed, 'easeInCubic');
             }
         }
 
@@ -231,16 +238,16 @@
                 top: '+=500%',
             },
                 {
-                    duration: 7000,
+                    duration: 7000 * speed,
                     queue: false,
                     complete: function () { $(this).remove(); }
                 });
             $("body").addClass("lift-off");
         }
 
-        function showMoon() {
-            $("#moon").addClass("transit");
-            setTimeout(restart, 20000);
+        function showPlanet() {
+            $("#planet").addClass("transit");
+            setTimeout(restart, 20000 * speed);
         }
 
         function restart() {
@@ -248,7 +255,8 @@
             audioI = 0;
             iteration++;
             $('.num').remove();
-            $('#rocket, #moon').removeAttr('style').removeClass("transit");
+            $('#rocket, #planet').removeAttr('style').removeClass("transit");
+            $('#planet').css('background-image', 'url(./svg/planet' + Math.max(iteration, 9) + '.svg)');
             $('body').removeClass('lift-off');
             createNumbers();
         }
@@ -292,12 +300,13 @@
             var shuffledColors = shuffle(colors);
             var coords = new Array(11);
             coords[0] = { x: 45, y: 40 };
+            var goForwards = true;
 
             for (var i = 1; i < 10; i++) {
-                createNumber(shuffledColors, container, coords, i, true);
+                createNumber(shuffledColors, container, coords, i, goForwards);
             };
 
-            $(".num-unlocked").draggable({ cursor: "move", stop: function (event, ui) { testHolder($(this)); } });
+            $(".num-unlocked").draggable({ cursor: "move", stop: function (event, ui) { testHolder($(this), goForwards); } });
         }
 
         function setFullScreen() {
@@ -325,11 +334,14 @@
         }
 
         function startGame(startButton) {
-            iteration = 1;
-            setFullScreen();
+            iteration++;
+            //setFullScreen();
 
-            if ((window.innerHeight > window.innerWidth) && !dev) {
-                alert("Please set Landscape orientation on your device before continuing.");
+            if (!dev) {
+                if ((window.innerHeight > window.innerWidth)) {
+                    alert("Please set Landscape orientation on your device before continuing.");
+                    
+                }
             }
 
             startButton.hide();
@@ -339,6 +351,10 @@
         }
 
         $(document).ready(function () {
+            $(window).resize(function () {
+                
+            });
+
             if (dev) {
                 startGame($("#play"));
             }
@@ -431,7 +447,7 @@
                      ry="1.6167839" />
         </svg>
 
-        <div id="moon"></div>
+        <div id="planet"></div>
     </div>
 
 </body>
