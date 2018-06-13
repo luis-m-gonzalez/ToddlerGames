@@ -256,7 +256,7 @@
             iteration++;
             $('.num').remove();
             $('#rocket, #planet').removeAttr('style').removeClass("transit");
-            $('#planet').css('background-image', 'url(./svg/planet' + Math.max(iteration, 9) + '.svg)');
+            $('#planet').css('background-image', 'url(./svg/planet' + Math.min(iteration, 9) + '.svg)');
             $('body').removeClass('lift-off');
             createNumbers();
         }
