@@ -12,6 +12,8 @@
             margin: 0;
         }
 
+        
+
         body.sky {
             color: #fff;
             background: linear-gradient(180deg, MidnightBlue 0%, MidnightBlue 25%, DeepSkyBlue 88%, DeepSkyBlue 91%,LimeGreen 91%,LimeGreen 100%);
@@ -37,6 +39,10 @@
 
         svg, span, div {
             position: absolute;
+        }
+
+        #rocket-holder {
+            position: static;
         }
 
         span {
@@ -117,6 +123,14 @@
             -webkit-transform: translateY(400%);
             transform: translateY(400%);
             transition: transform 18s linear;
+        }
+        #full-screen {
+            width: 9.5vw;
+            height: 9.5vw;
+            cursor: pointer;
+            display: none;
+            fill: green;
+            z-index: 99999;
         }
     </style>
 
@@ -348,19 +362,32 @@
             $("#rocket").removeClass("hide");
             $("body").addClass("sky");
             createNumbers();
+            $(window).resize(function () {
+                var isFullScreen = document.fullscreen || document.webkitIsFullScreen || document.mozFullScreen;
+
+                if (isFullScreen) {
+                    $("#full-screen").hide();
+                }
+                else {
+                    $("#full-screen").show();
+                }
+            });
         }
 
         $(document).ready(function () {
-            $(window).resize(function () {
-                
-            });
-
             if (dev) {
                 startGame($("#play"));
             }
             $("#play").on('click', function () {
                 startGame($(this));
             });
+
+            $("#full-screen").on('click', function () {
+                debugger;
+                setFullScreen();
+                $(this).removeAttr('style');
+            });
+            
         });
     </script>
 </head>
@@ -384,70 +411,71 @@
         <svg id="play" xmlns="http://www.w3.org/2000/svg" fill="green" viewBox=" 0 0 100 100">
             <polygon points="0,0 100,50 0,100" />
         </svg>
-
-        <svg xmlns:dc="http://purl.org/dc/elements/1.1/"
-             xmlns:cc="http://creativecommons.org/ns#"
-             xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-             xmlns:svg="http://www.w3.org/2000/svg"
-             xmlns="http://www.w3.org/2000/svg"
-             xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-             xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-             id="rocket"
-             viewBox="0 0 24 32"
-             class="hide"
-             version="1.1"
-             sodipodi:docname="rocket2.svg"
-             width="24"
-             height="32"
-             style="fill:#2f4f4f"
-             inkscape:version="0.92.3 (2405546, 2018-03-11)">
-            <metadata id="metadata3729">
-                <rdf:RDF>
-                    <cc:Work rdf:about="">
-                        <dc:format>image/svg+xml</dc:format>
-                        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-                        <dc:title />
-                    </cc:Work>
-                </rdf:RDF>
-            </metadata>
-            <defs id="defs3727" />
-            <sodipodi:namedview pagecolor="#ffffff"
-                                bordercolor="#666666"
-                                borderopacity="1"
-                                objecttolerance="10"
-                                gridtolerance="10"
-                                guidetolerance="10"
-                                inkscape:pageopacity="0"
-                                inkscape:pageshadow="2"
-                                inkscape:window-width="768"
-                                inkscape:window-height="711"
-                                id="namedview3725"
-                                showgrid="false"
-                                fit-margin-top="-2.7755576e-017"
-                                inkscape:zoom="6.0398704"
-                                inkscape:cx="14.15038"
-                                inkscape:cy="0.93147574"
-                                inkscape:window-x="441"
-                                inkscape:window-y="31"
-                                inkscape:window-maximized="0"
-                                inkscape:current-layer="rocket" />
-            <path d="M 7.411577,21.39 3.357779,24 3.0917922,22.947 c -0.1869907,-0.744 -0.085996,-1.534 0.281986,-2.199 l 2.6168696,-4.729 c 0.3869807,1.6 0.8479577,3.272 1.4209292,5.371 z m 13.214342,-0.642 -2.645868,-4.784 c -0.390981,1.656 -0.80296,3.22 -1.368932,5.441 L 20.642918,24 20.908905,22.947 c 0.18599,-0.743 0.08499,-1.533 -0.282986,-2.199 z M 10.553421,24 h 2.894855 l 0.551973,-2 H 10.000448 Z M 12.000349,-1e-6 c -3.4888268,2.503 -4.9997515,5.488 -4.9997515,9.191 C 7.0005975,12.531 8.1465404,16.466 9.3804789,21 h 5.2727371 c 1.180941,-4.668 2.311885,-8.577 2.346883,-11.844001 0.04,-3.731 -1.440928,-6.639 -4.99975,-9.156 z m 0.012,2.543 c 1.378931,1.201 2.235889,2.491 2.661867,3.996 -0.557972,0.304 -1.60692,0.461 -2.673866,0.461 -1.038949,0 -2.0718974,-0.145 -2.6408691,-0.433 0.441978,-1.512 1.3039351,-2.824 2.6528681,-4.024 z"
-                  id="path3722"/>
-            <ellipse style="fill:#ff0000; display:none"
-                     id="fire-red"
-                     cx="11.970732"
-                     cy="26.84878"
-                     rx="1.0243902"
-                     ry="2.692683" />
-            <ellipse style="fill:#ffcc00; display:none"
-                     id="fire-yellow"
-                     cx="11.968239"
-                     cy="26.326839"
-                     rx="0.62464041"
-                     ry="1.6167839" />
-        </svg>
-
+        <div id="rocket-holder">
+            <svg xmlns:dc="http://purl.org/dc/elements/1.1/"
+                 xmlns:cc="http://creativecommons.org/ns#"
+                 xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                 xmlns:svg="http://www.w3.org/2000/svg"
+                 xmlns="http://www.w3.org/2000/svg"
+                 xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+                 xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+                 id="rocket"
+                 viewBox="0 0 24 32"
+                 class="hide"
+                 version="1.1"
+                 sodipodi:docname="rocket2.svg"
+                 width="24"
+                 height="32"
+                 style="fill:#2f4f4f"
+                 inkscape:version="0.92.3 (2405546, 2018-03-11)">
+                <metadata id="metadata3729">
+                    <rdf:RDF>
+                        <cc:Work rdf:about="">
+                            <dc:format>image/svg+xml</dc:format>
+                            <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+                            <dc:title />
+                        </cc:Work>
+                    </rdf:RDF>
+                </metadata>
+                <defs id="defs3727" />
+                <sodipodi:namedview pagecolor="#ffffff"
+                                    bordercolor="#666666"
+                                    borderopacity="1"
+                                    objecttolerance="10"
+                                    gridtolerance="10"
+                                    guidetolerance="10"
+                                    inkscape:pageopacity="0"
+                                    inkscape:pageshadow="2"
+                                    inkscape:window-width="768"
+                                    inkscape:window-height="711"
+                                    id="namedview3725"
+                                    showgrid="false"
+                                    fit-margin-top="-2.7755576e-017"
+                                    inkscape:zoom="6.0398704"
+                                    inkscape:cx="14.15038"
+                                    inkscape:cy="0.93147574"
+                                    inkscape:window-x="441"
+                                    inkscape:window-y="31"
+                                    inkscape:window-maximized="0"
+                                    inkscape:current-layer="rocket" />
+                <path d="M 7.411577,21.39 3.357779,24 3.0917922,22.947 c -0.1869907,-0.744 -0.085996,-1.534 0.281986,-2.199 l 2.6168696,-4.729 c 0.3869807,1.6 0.8479577,3.272 1.4209292,5.371 z m 13.214342,-0.642 -2.645868,-4.784 c -0.390981,1.656 -0.80296,3.22 -1.368932,5.441 L 20.642918,24 20.908905,22.947 c 0.18599,-0.743 0.08499,-1.533 -0.282986,-2.199 z M 10.553421,24 h 2.894855 l 0.551973,-2 H 10.000448 Z M 12.000349,-1e-6 c -3.4888268,2.503 -4.9997515,5.488 -4.9997515,9.191 C 7.0005975,12.531 8.1465404,16.466 9.3804789,21 h 5.2727371 c 1.180941,-4.668 2.311885,-8.577 2.346883,-11.844001 0.04,-3.731 -1.440928,-6.639 -4.99975,-9.156 z m 0.012,2.543 c 1.378931,1.201 2.235889,2.491 2.661867,3.996 -0.557972,0.304 -1.60692,0.461 -2.673866,0.461 -1.038949,0 -2.0718974,-0.145 -2.6408691,-0.433 0.441978,-1.512 1.3039351,-2.824 2.6528681,-4.024 z"
+                      id="path3722" />
+                <ellipse style="fill:#ff0000; display:none"
+                         id="fire-red"
+                         cx="11.970732"
+                         cy="26.84878"
+                         rx="1.0243902"
+                         ry="2.692683" />
+                <ellipse style="fill:#ffcc00; display:none"
+                         id="fire-yellow"
+                         cx="11.968239"
+                         cy="26.326839"
+                         rx="0.62464041"
+                         ry="1.6167839" />
+            </svg>
+        </div>
         <div id="planet"></div>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22" id="full-screen"><g transform="matrix(.58303 0 0 .58303 2.73 2.728)" ><path d="m28.36 19.595c0-.868-.665-1.57-1.491-1.57-.819.002-1.492.702-1.492 1.57v3.25l-6.02-6.02c-.582-.583-1.524-.583-2.106 0-.582.582-.582 1.527 0 2.109l5.989 5.987h-3.235c-.881.002-1.591.669-1.591 1.491 0 .824.71 1.49 1.591 1.49h6.761c.881 0 1.59-.665 1.593-1.49-.003-.022-.006-.039-.009-.061.003-.028.009-.058.009-.087v-6.668h-.0001" /><path d="m9 16.824l-6.01 6.02v-3.25c0-.868-.672-1.568-1.493-1.57-.824 0-1.49.702-1.49 1.57l-.002 6.669c0 .029.008.059.001.087-.002.021-.006.038-.008.061.002.825.712 1.49 1.592 1.49h6.762c.879 0 1.59-.666 1.59-1.49 0-.822-.711-1.489-1.59-1.491h-3.235l5.989-5.987c.58-.582.58-1.527 0-2.109-.583-.584-1.526-.584-2.11-.0001" /><path d="m19.359 11.535l6.02-6.02v3.25c0 .865.673 1.565 1.492 1.568.826 0 1.491-.703 1.491-1.568v-6.671c0-.029-.006-.059-.009-.085.003-.021.006-.041.009-.062-.003-.826-.712-1.491-1.592-1.491h-6.761c-.881 0-1.591.665-1.591 1.491 0 .821.71 1.49 1.591 1.492h3.235l-5.989 5.987c-.582.581-.582 1.524 0 2.105.582.586 1.524.586 2.106.0001" /><path d="m5.121 3.442h3.234c.879-.002 1.59-.671 1.59-1.492 0-.826-.711-1.491-1.59-1.491h-6.761c-.88 0-1.59.665-1.592 1.491.002.021.006.041.008.062-.002.026-.001.055-.001.085l.002 6.672c0 .865.666 1.568 1.49 1.568.821-.003 1.493-.703 1.493-1.568v-3.25l6.01 6.02c.584.585 1.527.585 2.11 0 .58-.581.58-1.524 0-2.105l-5.989-5.988" /></g></svg>
     </div>
 
 </body>
