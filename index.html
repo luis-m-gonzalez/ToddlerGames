@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-    <title>A responsive educational game to help toddlers learn numbers and astronomy. Designed to work on any device, on fullscreen mode. A touch screen is recommended but not required.</title>
+    <title>Interactive educational game to help toddlers learn numbers and astronomy. Designed to work on any device, on fullscreen mode. A touch screen is recommended but not required.</title>
     <style>
         html, body {
             overflow: hidden;
@@ -12,20 +12,32 @@
             margin: 0;
         }
 
-        
-
-        body.sky {
-            color: #fff;
-            background: linear-gradient(180deg, MidnightBlue 0%, MidnightBlue 25%, DeepSkyBlue 88%, DeepSkyBlue 91%,LimeGreen 91%,LimeGreen 100%);
-            background-size: 400% 400%;
-            background-position: 50% 100%
-        }
+            body.sky {
+                color: #fff;
+                background: linear-gradient(180deg, #000044 0%, #000044 25%, DeepSkyBlue 88%, DeepSkyBlue 91%,LimeGreen 91%,LimeGreen 100%);
+                background-size: 400% 400%;
+                background-position: 50% 100%
+            }
 
         body.lift-off {
             animation: Gradient 10s 1;
             animation-fill-mode: forwards;
         }
 
+        .fade-in-stars {
+            animation: fadeInStars 15s 1;
+            animation-fill-mode: forwards;
+        }
+
+        @keyframes fadeInStars {
+            0% {
+                opacity: 0
+            }
+
+            to {
+                opacity: 0.7
+            }
+        }
 
         @keyframes Gradient {
             0% {
@@ -48,6 +60,13 @@
         span {
             display: inline-block;
             text-align: center;
+        }
+        .star {
+            display: block;
+            width: 2vw;
+            height: 2vw;
+            display: none;
+            z-index: 1;
         }
 
         .num {
@@ -103,6 +122,8 @@
             height: 9.5vw;
             top: 53%;
             left: 45%;
+            z-index: 10;
+            fill: SlateGray;
         }
 
         .hide {
@@ -117,6 +138,7 @@
             background-image: url(./svg/planet1.svg);
             left: 15%;
             top: -70%;
+            z-index: 2;
         }
 
         .transit {
@@ -241,9 +263,37 @@
                 $("#fire-red, #fire-yellow").css("display", "block");
                 setTimeout(showPlanet, 13500 * speed);
                 setTimeout(liftOff, 7500 * speed);
+                setTimeout(stars, 6500 * speed);
                 $('#rocket').animate({
                     top: '-=40%',
                 }, 8000 * speed, 'easeInCubic');
+            }
+        }
+
+        function stars() {
+            let star1 = $('.star');
+            star1.addClass('fade-in-stars');
+            let colors = ['ivory', 'lightpink', 'lightyellow', 'lightblue'];
+
+            for (var i = 0; i < 150; i++) {
+                setTimeout(function () {
+                    let top = getRandomInt(-10, 1001) / 10;
+                    let left = getRandomInt(-10, 1001) / 10;
+                    let scale = getRandomInt(5, 11) / 10;
+                    let rotate = getRandomInt(0, 91);
+                    let fill = colors[getRandomInt(0, 4)];
+
+
+                    let clone = star1.clone();
+                    clone.css({
+                        'top': top + '%',
+                        'left': left + '%',
+                        'transform': `rotate(${rotate}deg) scale(${scale})`,
+                        'fill': fill,
+                        'display': 'block'
+                    }).appendTo($("body"));
+
+                }, (30 * i));
             }
         }
 
@@ -267,10 +317,13 @@
         function restart() {
             $("#fire-red, #fire-yellow").css("display", "none");
             audioI = 0;
-            iteration++;
+            iteration = iteration === 9 ? 1 : iteration + 1;
             $('.num').remove();
+
+            $('.star').slice(1).remove();
+            $('.star').removeAttr('style');
             $('#rocket, #planet').removeAttr('style').removeClass("transit");
-            $('#planet').css('background-image', 'url(./svg/planet' + Math.min(iteration, 9) + '.svg)');
+            $('#planet').css('background-image', 'url(./svg/planet' + iteration + '.svg)');
             $('body').removeClass('lift-off');
             createNumbers();
         }
@@ -426,7 +479,6 @@
                  sodipodi:docname="rocket2.svg"
                  width="24"
                  height="32"
-                 style="fill:#2f4f4f"
                  inkscape:version="0.92.3 (2405546, 2018-03-11)">
                 <metadata id="metadata3729">
                     <rdf:RDF>
@@ -475,7 +527,26 @@
             </svg>
         </div>
         <div id="planet"></div>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22" id="full-screen"><g transform="matrix(.58303 0 0 .58303 2.73 2.728)" ><path d="m28.36 19.595c0-.868-.665-1.57-1.491-1.57-.819.002-1.492.702-1.492 1.57v3.25l-6.02-6.02c-.582-.583-1.524-.583-2.106 0-.582.582-.582 1.527 0 2.109l5.989 5.987h-3.235c-.881.002-1.591.669-1.591 1.491 0 .824.71 1.49 1.591 1.49h6.761c.881 0 1.59-.665 1.593-1.49-.003-.022-.006-.039-.009-.061.003-.028.009-.058.009-.087v-6.668h-.0001" /><path d="m9 16.824l-6.01 6.02v-3.25c0-.868-.672-1.568-1.493-1.57-.824 0-1.49.702-1.49 1.57l-.002 6.669c0 .029.008.059.001.087-.002.021-.006.038-.008.061.002.825.712 1.49 1.592 1.49h6.762c.879 0 1.59-.666 1.59-1.49 0-.822-.711-1.489-1.59-1.491h-3.235l5.989-5.987c.58-.582.58-1.527 0-2.109-.583-.584-1.526-.584-2.11-.0001" /><path d="m19.359 11.535l6.02-6.02v3.25c0 .865.673 1.565 1.492 1.568.826 0 1.491-.703 1.491-1.568v-6.671c0-.029-.006-.059-.009-.085.003-.021.006-.041.009-.062-.003-.826-.712-1.491-1.592-1.491h-6.761c-.881 0-1.591.665-1.591 1.491 0 .821.71 1.49 1.591 1.492h3.235l-5.989 5.987c-.582.581-.582 1.524 0 2.105.582.586 1.524.586 2.106.0001" /><path d="m5.121 3.442h3.234c.879-.002 1.59-.671 1.59-1.492 0-.826-.711-1.491-1.59-1.491h-6.761c-.88 0-1.59.665-1.592 1.491.002.021.006.041.008.062-.002.026-.001.055-.001.085l.002 6.672c0 .865.666 1.568 1.49 1.568.821-.003 1.493-.703 1.493-1.568v-3.25l6.01 6.02c.584.585 1.527.585 2.11 0 .58-.581.58-1.524 0-2.105l-5.989-5.988" /></g></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22" id="full-screen"><g transform="matrix(.58303 0 0 .58303 2.73 2.728)"><path d="m28.36 19.595c0-.868-.665-1.57-1.491-1.57-.819.002-1.492.702-1.492 1.57v3.25l-6.02-6.02c-.582-.583-1.524-.583-2.106 0-.582.582-.582 1.527 0 2.109l5.989 5.987h-3.235c-.881.002-1.591.669-1.591 1.491 0 .824.71 1.49 1.591 1.49h6.761c.881 0 1.59-.665 1.593-1.49-.003-.022-.006-.039-.009-.061.003-.028.009-.058.009-.087v-6.668h-.0001" /><path d="m9 16.824l-6.01 6.02v-3.25c0-.868-.672-1.568-1.493-1.57-.824 0-1.49.702-1.49 1.57l-.002 6.669c0 .029.008.059.001.087-.002.021-.006.038-.008.061.002.825.712 1.49 1.592 1.49h6.762c.879 0 1.59-.666 1.59-1.49 0-.822-.711-1.489-1.59-1.491h-3.235l5.989-5.987c.58-.582.58-1.527 0-2.109-.583-.584-1.526-.584-2.11-.0001" /><path d="m19.359 11.535l6.02-6.02v3.25c0 .865.673 1.565 1.492 1.568.826 0 1.491-.703 1.491-1.568v-6.671c0-.029-.006-.059-.009-.085.003-.021.006-.041.009-.062-.003-.826-.712-1.491-1.592-1.491h-6.761c-.881 0-1.591.665-1.591 1.491 0 .821.71 1.49 1.591 1.492h3.235l-5.989 5.987c-.582.581-.582 1.524 0 2.105.582.586 1.524.586 2.106.0001" /><path d="m5.121 3.442h3.234c.879-.002 1.59-.671 1.59-1.492 0-.826-.711-1.491-1.59-1.491h-6.761c-.88 0-1.59.665-1.592 1.491.002.021.006.041.008.062-.002.026-.001.055-.001.085l.002 6.672c0 .865.666 1.568 1.49 1.568.821-.003 1.493-.703 1.493-1.568v-3.25l6.01 6.02c.584.585 1.527.585 2.11 0 .58-.581.58-1.524 0-2.105l-5.989-5.988" /></g></svg>
+
+        <svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg"
+             version="1.1"
+             viewBox="0 0 24.900572 24.900572" class="star">
+            <defs id="defs2" />
+            <metadata id="metadata5">
+                <rdf:RDF>
+                    <cc:Work rdf:about="">
+                        <dc:format>image/svg+xml</dc:format><dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title>
+                    </cc:Work>
+                </rdf:RDF>
+            </metadata>
+            <g transform="translate(-0.06681667,-272.0593)"
+               id="layer1">
+                <path d="m 0.06681667,284.85988 10.24174933,-2.43796 1.858237,-10.36262 2.43796,10.24175 10.362627,1.85823 -10.24175,2.43796 -1.858237,10.36263 -2.43796,-10.24175 z"
+                      id="path825" />
+            </g>
+        </svg>
+
     </div>
 
 </body>
