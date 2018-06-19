@@ -1,0 +1,12 @@
+
+*.user
+*.csproj
+Properties/launchSettings.json
+obj/ToddlerGames.csproj.nuget.g.targets
+obj/ToddlerGames.csproj.nuget.g.props
+obj/ToddlerGames.csproj.nuget.cache
+obj/project.assets.json
+obj/Debug/netcoreapp2.0/ToddlerGames.csprojAssemblyReference.cache
+obj/Debug/netcoreapp2.0/ToddlerGames.csproj.CoreCompileInputs.cache
+obj/Debug/netcoreapp2.0/ToddlerGames.AssemblyInfoInputs.cache
+obj/Debug/netcoreapp2.0/ToddlerGames.AssemblyInfo.cs

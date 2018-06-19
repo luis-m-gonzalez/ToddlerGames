@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
     <title>Interactive educational game to help toddlers learn numbers and astronomy. Designed to work on any device, on fullscreen mode. A touch screen is recommended but not required.</title>
     <style>
+        #canvas1 {
+            position: absolute;
+            opacity: 0;
+            z-index: 2;
+        }
         html, body {
             overflow: hidden;
             height: 100%;
@@ -14,7 +19,7 @@
 
             body.sky {
                 color: #fff;
-                background: linear-gradient(180deg, #000044 0%, #000044 25%, DeepSkyBlue 88%, DeepSkyBlue 91%,LimeGreen 91%,LimeGreen 100%);
+                background: linear-gradient(180deg, #000033 0%, #000033 25%, DeepSkyBlue 88%, DeepSkyBlue 91%,LimeGreen 91%,LimeGreen 100%);
                 background-size: 400% 400%;
                 background-position: 50% 100%
             }
@@ -263,7 +268,7 @@
                 $("#fire-red, #fire-yellow").css("display", "block");
                 setTimeout(showPlanet, 13500 * speed);
                 setTimeout(liftOff, 7500 * speed);
-                setTimeout(stars, 6500 * speed);
+                setTimeout(stars, 8500 * speed);
                 $('#rocket').animate({
                     top: '-=40%',
                 }, 8000 * speed, 'easeInCubic');
@@ -271,30 +276,9 @@
         }
 
         function stars() {
-            let star1 = $('.star');
-            star1.addClass('fade-in-stars');
-            let colors = ['ivory', 'lightpink', 'lightyellow', 'lightblue'];
+            let canvas = document.getElementById('canvas1');
 
-            for (var i = 0; i < 150; i++) {
-                setTimeout(function () {
-                    let top = getRandomInt(-10, 1001) / 10;
-                    let left = getRandomInt(-10, 1001) / 10;
-                    let scale = getRandomInt(5, 11) / 10;
-                    let rotate = getRandomInt(0, 91);
-                    let fill = colors[getRandomInt(0, 4)];
-
-
-                    let clone = star1.clone();
-                    clone.css({
-                        'top': top + '%',
-                        'left': left + '%',
-                        'transform': `rotate(${rotate}deg) scale(${scale})`,
-                        'fill': fill,
-                        'display': 'block'
-                    }).appendTo($("body"));
-
-                }, (30 * i));
-            }
+            canvas.setAttribute("class", "fade-in-stars");
         }
 
         function liftOff() {
@@ -316,6 +300,9 @@
 
         function restart() {
             $("#fire-red, #fire-yellow").css("display", "none");
+
+            let canvas = document.getElementById('canvas1');
+            canvas.removeAttribute("class");
             audioI = 0;
             iteration = iteration === 9 ? 1 : iteration + 1;
             $('.num').remove();
@@ -382,7 +369,6 @@
             }
 
             let html = $("html")[0];
-
             if (html.requestFullscreen) {
                 html.requestFullscreen();
             }
@@ -415,6 +401,7 @@
             $("#rocket").removeClass("hide");
             $("body").addClass("sky");
             createNumbers();
+            setTimeout(prepareStars, 500);
             $(window).resize(function () {
                 var isFullScreen = document.fullscreen || document.webkitIsFullScreen || document.mozFullScreen;
 
@@ -427,7 +414,63 @@
             });
         }
 
+        function prepareStars() {
+            let maxX = window.innerWidth;
+            let maxY = window.innerHeight;
+            let colors = ['ivory', 'lightpink', 'lightyellow', 'lightblue'];
+
+
+            let canvas = document.getElementById('canvas1');
+
+            canvas.setAttribute("width", maxX);
+            canvas.setAttribute("height", maxY);
+            let ctx = canvas.getContext('2d');
+
+            let sideOriginal = (maxX / 200);
+
+            for (let i = 0; i < 200; i++) {
+                var sideScale = (getRandomInt(10, 21) / 10) * sideOriginal;
+                let halfSide = sideScale / 2;
+                let midPoint = halfSide / 3;
+
+                let x = getRandomInt(0, maxX + 1);
+                let y = getRandomInt(0, maxY + 1);
+                let fill = getRandomInt(0, 4);
+                ctx.fillStyle = colors[fill];
+
+                let points = [{ x: x - halfSide, y: y - halfSide },
+                    { x: x - halfSide, y: y - halfSide },
+                    { x: x, y: y - midPoint},
+                    { x: x + halfSide, y: y - halfSide },
+                    { x: x + midPoint, y: y },
+                    { x: x + halfSide, y: y + halfSide },
+                    { x: x, y: y + midPoint },
+                    { x: x - halfSide, y: y + halfSide },
+                    { x: x - midPoint, y: y }];
+
+                let angle = getRandomInt(0, 91);
+                let cos = Math.cos(angle);
+                let sin = Math.sin(angle);
+
+                let temp;
+                for (let i = 0; i < 9; i++ ) {
+                    temp = ((points[i].x - x) * cos - (points[i].y - y) * sin) + x;
+                    points[i].y = ((points[i].x - x) * sin + (points[i].y - y) * cos) + y;
+                    points[i].x = temp;
+                }
+
+                ctx.beginPath();
+                ctx.moveTo(points[0].x, points[0].y);
+                for (let i = 1; i < 9; i++) {
+                    ctx.lineTo(points[i].x, points[i].y);
+                }
+                ctx.fill();
+            }
+         }
+
+
         $(document).ready(function () {
+
             if (dev) {
                 startGame($("#play"));
             }
@@ -436,7 +479,7 @@
             });
 
             $("#full-screen").on('click', function () {
-                debugger;
+                
                 setFullScreen();
                 $(this).removeAttr('style');
             });
@@ -445,6 +488,7 @@
     </script>
 </head>
 <body>
+    <canvas id="canvas1"></canvas>
     <div id="container">
         <audio id="so1">
             <source src="./mp3/so1.mp3" type="audio/mp3">
