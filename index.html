@@ -17,7 +17,7 @@
             margin: 0;
         }
 
-        body.sky {
+        #container.sky {
             color: #fff;
             background: linear-gradient(180deg, #000022 0%, #000022 25%, DeepSkyBlue 88%, DeepSkyBlue 91%,LimeGreen 91%,LimeGreen 100%);
             background-size: 400% 400%;
@@ -28,7 +28,7 @@
             width: 20vw;
         }
 
-        body.lift-off {
+        #container.lift-off {
             animation-name: Gradient;
             animation-fill-mode: forwards;
         }
@@ -64,6 +64,56 @@
 
         div, span, label, input, svg {
             display: inline-block;
+        }
+
+        .rocket-go {
+            animation-name: rocketGo;
+            animation-fill-mode: forwards;
+            /*animation-timing-function: cubic-bezier(.63,.03,.72,.43);*/
+            animation-timing-function: ease-in;
+        }
+
+        @keyframes rocketGo {
+            0% {
+                top: 53%;
+                left: 45%;
+                transform: none;
+            }
+            20% {
+                top: 13%;
+                left: 45%;
+                transform: none;
+            }
+            40% {
+                top: 13%;
+                left: 45%;
+                transform: none;
+                animation-timing-function: linear;
+            }
+            55% {
+                top: 28%;
+                left: 50%;
+                transform: rotate(45deg);
+                animation-timing-function: linear;
+            }
+            65% {
+                top: 43%;
+                left: 65%;
+                transform: rotate(45deg);
+                animation-timing-function: linear;
+            }
+            80% {
+                top: 53%;
+                transform: none;
+                left: 80%;
+                animation-timing-function: linear;
+            }
+            100% {
+                top: 53%;
+                transform: none;
+                left: 80%;
+            }
+
         }
 
         #settings {
@@ -119,6 +169,7 @@
             position: relative;
             padding-bottom: 56.25%;
             width: 100%;
+            overflow: hidden;
         }
 
         .num-hold {
@@ -160,19 +211,19 @@
         }
 
         #planet {
-            width: 30vw;
-            height: 30vw;
+            width: 60vw;
+            height: 60vw;
             background-repeat: no-repeat;
             background-size: contain;
             background-image: url(./svg/planet1.svg);
-            left: 15%;
-            top: -70%;
+            left: 22%;
+            top: -140%;
             z-index: 2;
         }
 
         .transit {
-            -webkit-transform: translateY(400%);
-            transform: translateY(400%);
+            -webkit-transform: translateY(150%);
+            transform: translateY(150%);
             transition-property: transform;
             transition-timing-function: linear;
         }
@@ -291,12 +342,14 @@
                 audio = document.getElementById("so5");
                 audio.play();
                 $("#fire-red, #fire-yellow").css("display", "block");
-                setTimeout(showPlanet, 13500 / speed);
-                setTimeout(liftOff, 7500 / speed);
                 setTimeout(stars, 8500 / speed);
-                $('#rocket').animate({
-                    top: '-=40%',
-                }, 8000 / speed, 'easeInCubic');
+                setTimeout(showPlanet, 13000 / speed);
+                setTimeout(fadeGround, 5500 / speed);
+
+                let duration = 24 / speed;
+                let delay = 1 / speed;
+                $('#rocket').css('animation-duration', duration + 's')
+                    .css('animation-delay', delay + 's').addClass('rocket-go');
             }
         }
 
@@ -309,22 +362,22 @@
 
         }
 
-        function liftOff() {
+        function fadeGround() {
             $('.num, .num-hold').animate({
                 top: '+=500%',
             },
                 {
-                    duration: 7000 / speed,
+                    duration: 9000 / speed,
                     queue: false,
                     complete: function () { $(this).remove(); }
                 });
-            let duration = 10 / speed;
-            $("body").addClass("lift-off").css('animation-duration', duration + 's');
+            let duration = 12 / speed;
+            $("#container").css('animation-duration', duration + 's').addClass("lift-off");
         }
 
         function showPlanet() {
             let duration = 18 / speed;
-            $("#planet").addClass("transit").css(`transition-duration`, `${duration}s`);
+            $("#planet").css(`transition-duration`, `${duration}s`).addClass("transit");
             setTimeout(restart, 20000 / speed);
         }
 
@@ -339,9 +392,9 @@
 
             $('.star').slice(1).remove();
             $('.star').removeAttr('style');
-            $('#rocket, #planet').removeAttr('style').removeClass("transit");
+            $('#rocket, #planet').removeAttr('style').removeAttr("class");
             $('#planet').css('background-image', 'url(./svg/planet' + iteration + '.svg)');
-            $('body').removeClass('lift-off');
+            $('#container').removeClass('lift-off');
             createNumbers();
         }
 
@@ -432,7 +485,7 @@
 
             startButton.hide();
             $("#rocket").removeClass("hide");
-            $("body").addClass("sky");
+            $("#container").addClass("sky");
             createNumbers();
             setTimeout(prepareStars, 500);
             $(window).resize(function () {
@@ -448,8 +501,8 @@
         }
 
         function prepareStars() {
-            let maxX = window.innerWidth;
-            let maxY = window.innerHeight;
+            let maxX = $("#container").width();
+            let maxY = $("#container").outerHeight();
             let colors = ['ivory', 'lightpink', 'lightyellow', 'lightblue'];
 
 
@@ -510,12 +563,22 @@
             if (dev) {
                 startGame($("#play"));
             }
+
             $("#play").on('click', function () {
                 startGame($(this));
             });
 
+            $("#planet").on('webkitAnimationEnd oanimationend msAnimationEnd animationend', function (e) {
+                var name = e.originalEvent.animationName;
+
+                if (name === 'rocketGo') {
+                    setTimeout(showPlanet, 5000 / speed);
+                    fadeGround();
+                    let delay = 5 / speed;
+                }
+            });
+
             $("#full-screen").on('click', function () {
-                
                 setFullScreen();
                 $(this).removeAttr('style');
             });
