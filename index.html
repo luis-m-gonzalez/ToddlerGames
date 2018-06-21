@@ -17,20 +17,24 @@
             margin: 0;
         }
 
-            body.sky {
-                color: #fff;
-                background: linear-gradient(180deg, #000033 0%, #000033 25%, DeepSkyBlue 88%, DeepSkyBlue 91%,LimeGreen 91%,LimeGreen 100%);
-                background-size: 400% 400%;
-                background-position: 50% 100%
-            }
+        body.sky {
+            color: #fff;
+            background: linear-gradient(180deg, #000022 0%, #000022 25%, DeepSkyBlue 88%, DeepSkyBlue 91%,LimeGreen 91%,LimeGreen 100%);
+            background-size: 400% 400%;
+            background-position: 50% 100%
+        }
+
+        .lbl-main {
+            width: 20vw;
+        }
 
         body.lift-off {
-            animation: Gradient 10s 1;
+            animation-name: Gradient;
             animation-fill-mode: forwards;
         }
 
         .fade-in-stars {
-            animation: fadeInStars 15s 1;
+            animation-name: fadeInStars;
             animation-fill-mode: forwards;
         }
 
@@ -54,8 +58,29 @@
             }
         }
 
-        svg, span, div {
+        * {
             position: absolute;
+        }
+
+        div, span, label, input, svg {
+            display: inline-block;
+        }
+
+        #settings {
+            z-index: 40;
+            top: 37%;
+            left: 5%;
+        }
+
+        #settings * {
+            position: static;
+            font-size: 4vw;
+        }
+
+        input {
+            width: 4vw;
+            height: 4vw;
+            margin-left: 2vw;
         }
 
         #rocket-holder {
@@ -63,7 +88,6 @@
         }
 
         span {
-            display: inline-block;
             text-align: center;
         }
         .star {
@@ -117,8 +141,8 @@
         #play {
             width: 15%;
             height: 25%;
-            top: 40%;
-            left: 45%;
+            top: 30%;
+            left: 75%;
             cursor: pointer;
         }
 
@@ -149,7 +173,8 @@
         .transit {
             -webkit-transform: translateY(400%);
             transform: translateY(400%);
-            transition: transform 18s linear;
+            transition-property: transform;
+            transition-timing-function: linear;
         }
         #full-screen {
             width: 9.5vw;
@@ -177,12 +202,12 @@
 
 
     <script>
-        var dev = 0;
-        var colors = ["red", "blue", "green", "darkorange", "gold", "purple", "black", "brown", "gray"];
-        var audioI = 0;
-        var audio;
-        var iteration = 0;
-        var speed = 1;
+        let dev = 0;
+        let colors = ["red", "blue", "green", "darkorange", "gold", "purple", "black", "brown", "gray"];
+        let audioI = 0;
+        let audio;
+        let iteration = 0;
+        let speed;
 
         function getRandomInt(min, max) {
             min = Math.ceil(min);
@@ -191,23 +216,23 @@
         }
 
         function shuffle(o) {
-            for (var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+            for (let j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
             return o;
         };
 
         function testHolder(element, goForwards) {
-            var number = element.text();
-            var hold = $('.hold' + number);
-            var num = $('.num' + number);
-            var holdCoord = { x: hold.offset().left, y: hold.offset().top };
-            var numCoord = { x: num.offset().left, y: num.offset().top };
-            var parsedNumber = parseInt(number, 10);
-            var firstNumber = goForwards ? 1 : 9;
-            var previousNumber = goForwards ? parsedNumber - 1 : parsedNumber + 1;
-            var isValid = (parsedNumber === firstNumber) || !$('.num' + previousNumber).hasClass('num-unlocked');
-            var distance = window.innerWidth / 5;
+            let number = element.text();
+            let hold = $('.hold' + number);
+            let num = $('.num' + number);
+            let holdCoord = { x: hold.offset().left, y: hold.offset().top };
+            let numCoord = { x: num.offset().left, y: num.offset().top };
+            let parsedNumber = parseInt(number, 10);
+            let firstNumber = goForwards ? 1 : 9;
+            let previousNumber = goForwards ? parsedNumber - 1 : parsedNumber + 1;
+            let isValid = (parsedNumber === firstNumber) || !$('.num' + previousNumber).hasClass('num-unlocked');
+            let distance = window.innerWidth / 5;
 
-            var success = Math.abs(holdCoord.x - numCoord.x) < distance && Math.abs(holdCoord.y - numCoord.y) < distance;
+            let success = Math.abs(holdCoord.x - numCoord.x) < distance && Math.abs(holdCoord.y - numCoord.y) < distance;
             if (isValid && success) {
                 if (audio) {
                     audio.load();
@@ -245,14 +270,14 @@
                 }, { queue: false, duration: 1000 });
             }
 
-            var minBottom = window.innerHeight * 0.55;
+            let minBottom = window.innerHeight * 0.55;
             if (numCoord.y > minBottom) {
                 num.animate({
                     top: "-=50%"
                 }, { queue: false, duration: 1000 });
             }
 
-            var minRight = window.innerWidth * 0.80;
+            let minRight = window.innerWidth * 0.80;
             if (numCoord.x > minRight) {
                 num.animate({
                     left: "-=50%"
@@ -266,12 +291,12 @@
                 audio = document.getElementById("so5");
                 audio.play();
                 $("#fire-red, #fire-yellow").css("display", "block");
-                setTimeout(showPlanet, 13500 * speed);
-                setTimeout(liftOff, 7500 * speed);
-                setTimeout(stars, 8500 * speed);
+                setTimeout(showPlanet, 13500 / speed);
+                setTimeout(liftOff, 7500 / speed);
+                setTimeout(stars, 8500 / speed);
                 $('#rocket').animate({
                     top: '-=40%',
-                }, 8000 * speed, 'easeInCubic');
+                }, 8000 / speed, 'easeInCubic');
             }
         }
 
@@ -279,6 +304,9 @@
             let canvas = document.getElementById('canvas1');
 
             canvas.setAttribute("class", "fade-in-stars");
+            let duration = 15 / speed; 
+            canvas.setAttribute("style", `animation-duration: ${duration}s`);
+
         }
 
         function liftOff() {
@@ -286,16 +314,18 @@
                 top: '+=500%',
             },
                 {
-                    duration: 7000 * speed,
+                    duration: 7000 / speed,
                     queue: false,
                     complete: function () { $(this).remove(); }
                 });
-            $("body").addClass("lift-off");
+            let duration = 10 / speed;
+            $("body").addClass("lift-off").css('animation-duration', duration + 's');
         }
 
         function showPlanet() {
-            $("#planet").addClass("transit");
-            setTimeout(restart, 20000 * speed);
+            let duration = 18 / speed;
+            $("#planet").addClass("transit").css(`transition-duration`, `${duration}s`);
+            setTimeout(restart, 20000 / speed);
         }
 
         function restart() {
@@ -316,11 +346,11 @@
         }
 
         function createNumber(shuffledColors, container, coords, i, forwards) {
-            var colorNum = getRandomInt(0, 9);
-            var left;
-            var top;
-            var numberLocked = i > iteration;
-            var cssClass;
+            let colorNum = getRandomInt(0, 9);
+            let left;
+            let top;
+            let numberLocked = i > iteration;
+            let cssClass;
 
             let holdLeft = forwards ? (5 + (10 * (i - 1))) : (85 - (10 * (i - 1)));
             container.append("<div class='num-hold hold" + i + "' style='background-color:" + shuffledColors[i - 1] + ";left:" + holdLeft + "%' ></div>");
@@ -350,13 +380,13 @@
         }
 
         function createNumbers() {
-            var container = $("#container");
-            var shuffledColors = shuffle(colors);
-            var coords = new Array(11);
+            let container = $("#container");
+            let shuffledColors = shuffle(colors);
+            let coords = new Array(11);
             coords[0] = { x: 45, y: 40 };
-            var goForwards = true;
+            let goForwards = true;
 
-            for (var i = 1; i < 10; i++) {
+            for (let i = 1; i < 10; i++) {
                 createNumber(shuffledColors, container, coords, i, goForwards);
             };
 
@@ -388,6 +418,9 @@
 
         function startGame(startButton) {
             iteration++;
+            speed = parseFloat($("input[name=speed]:checked").val());
+            localStorage.setItem("speed", speed);
+            $("#settings").remove();
             setFullScreen();
 
             if (!dev) {
@@ -403,7 +436,7 @@
             createNumbers();
             setTimeout(prepareStars, 500);
             $(window).resize(function () {
-                var isFullScreen = document.fullscreen || document.webkitIsFullScreen || document.mozFullScreen;
+                let isFullScreen = document.fullscreen || document.webkitIsFullScreen || document.mozFullScreen;
 
                 if (isFullScreen) {
                     $("#full-screen").hide();
@@ -429,7 +462,7 @@
             let sideOriginal = (maxX / 200);
 
             for (let i = 0; i < 200; i++) {
-                var sideScale = (getRandomInt(10, 21) / 10) * sideOriginal;
+                let sideScale = (getRandomInt(10, 21) / 10) * sideOriginal;
                 let halfSide = sideScale / 2;
                 let midPoint = halfSide / 3;
 
@@ -471,6 +504,9 @@
 
         $(document).ready(function () {
 
+            var prevSpeed = localStorage.getItem("speed") || "1";
+            $(`#speed${prevSpeed.replace('.','_')}`).prop("checked", true);
+
             if (dev) {
                 startGame($("#play"));
             }
@@ -508,6 +544,14 @@
         <svg id="play" xmlns="http://www.w3.org/2000/svg" fill="green" viewBox=" 0 0 100 100">
             <polygon points="0,0 100,50 0,100" />
         </svg>
+        <div id="settings">
+            <label class="lbl-main">SPEED</label>
+            <input type="radio" name="speed" value="1" id="speed1" /><label>1</label>
+            <input type="radio" name="speed" value="1.5" id="speed1_5" /><label>1.5</label>
+            <input type="radio" name="speed" value="2" id="speed2" /><label>2</label>
+            <input type="radio" name="speed" value="4" id="speed4" /><label>4</label>
+        </div>
+
         <div id="rocket-holder">
             <svg xmlns:dc="http://purl.org/dc/elements/1.1/"
                  xmlns:cc="http://creativecommons.org/ns#"
