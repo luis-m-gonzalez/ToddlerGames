@@ -38,6 +38,28 @@
             animation-fill-mode: forwards;
         }
 
+        .orbit {
+            animation-name: halfOrbit;
+            animation-fill-mode: forwards;
+        }
+
+        @keyframes halfOrbit {
+            100% {
+                transform: rotate(-180deg);
+            }
+        }
+
+        .shrink {
+            animation-name: doShrink;
+            animation-fill-mode: forwards;
+        }
+
+        @keyframes doShrink {
+            100% {
+                transform: scale(0.01);
+            }
+        }
+
         @keyframes fadeInStars {
             0% {
                 opacity: 0
@@ -68,7 +90,6 @@
 
         .rocket-go {
             animation-name: rocketGo;
-            animation-fill-mode: forwards;
             /*animation-timing-function: cubic-bezier(.63,.03,.72,.43);*/
             animation-timing-function: ease-in;
         }
@@ -135,6 +156,7 @@
 
         #rocket-holder {
             position: static;
+            z-index: 50;
         }
 
         span {
@@ -170,6 +192,7 @@
             padding-bottom: 56.25%;
             width: 100%;
             overflow: hidden;
+            height: 0;
         }
 
         .num-hold {
@@ -378,7 +401,7 @@
         function showPlanet() {
             let duration = 18 / speed;
             $("#planet").css(`transition-duration`, `${duration}s`).addClass("transit");
-            setTimeout(restart, 20000 / speed);
+            //setTimeout(restart, 20000 / speed);
         }
 
         function restart() {
@@ -390,9 +413,7 @@
             iteration = iteration === 9 ? 1 : iteration + 1;
             $('.num').remove();
 
-            $('.star').slice(1).remove();
-            $('.star').removeAttr('style');
-            $('#rocket, #planet').removeAttr('style').removeAttr("class");
+            $('#rocket, #planet, #rocket-holder').removeAttr('style').removeAttr("class");
             $('#planet').css('background-image', 'url(./svg/planet' + iteration + '.svg)');
             $('#container').removeClass('lift-off');
             createNumbers();
@@ -568,14 +589,54 @@
                 startGame($(this));
             });
 
-            $("#planet").on('webkitAnimationEnd oanimationend msAnimationEnd animationend', function (e) {
+            $("#planet").on('transitionend webkitTransitionEnd oTransitionEnd', function (e) {
+                //$("#planet").on('webkitAnimationEnd oanimationend msAnimationEnd animationend', function (e) {
+                var rocket = $("#rocket");
+                var rocketHold = $("#rocket-holder");
+                var planet = $("#planet");
+                var rocketPos = rocket.offset();
+                var rocketHoldPos = rocketHold.offset();
+                var planetPos = planet.offset();
+                var duration = (10 / speed) + 's';
+
+                var rocketHoldLeft = planetPos.left + (planetPos.left / 10);
+
+                rocketHold.css(
+                    {
+                        "position": "relative",
+                        "width": planet.width(),
+                        "height": planet.height(),
+                        "top": planetPos.top,
+                        "left": rocketHoldLeft,
+                        "animation-duration": duration
+                    });
+                rocket.css(
+                    {
+                        "top": rocketPos.top - planetPos.top,
+                        "left": rocketPos.left - rocketHoldLeft,
+                        "animation-duration": duration
+                    });
+
+
+                rocketHold.addClass('orbit');
+                rocket.removeAttr('class').addClass('shrink');
+            });
+
+
+            $("#rocket").on('webkitAnimationEnd oanimationend msAnimationEnd animationend', function (e) {
                 var name = e.originalEvent.animationName;
 
                 if (name === 'rocketGo') {
-                    setTimeout(showPlanet, 5000 / speed);
-                    fadeGround();
-                    let delay = 5 / speed;
+                    $(this).css(
+                        {
+                            "top": "53%",
+                            "left": "80%",
+                        });
                 }
+                else {
+                    restart();
+                }
+
             });
 
             $("#full-screen").on('click', function () {
@@ -599,7 +660,7 @@
             <source src="./mp3/so3.mp3" type="audio/mp3">
         </audio>
         <audio id="so4">
-            <source src="./mp3/so4.mp3" type="audio/mp3">
+            <source src="./mp3/so4.mp3" type="audio/p3">
         </audio>
         <audio id="so5">
             <source src="./mp3/so5.mp3" type="audio/mp3">
