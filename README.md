@@ -3,4 +3,4 @@ Interactive educational game to help toddlers learn numbers and astronomy. Desig
 
 The site is written using JavaScript (ES6), SVG and CSS3 animations and gradients, using a fully vectorial design.
 
-https://l-g-dev.github.io/ToddlerGames/
+https://luis-m-gonzalez.github.io/ToddlerGames/
